@@ -1,1 +1,1 @@
-# NovusTerm
+# NovusTerm, A Windows bases terminal
