@@ -22,6 +22,7 @@ obj/
 [Rr]eleases/
 x64/
 x86/
+novusTerm/x64
 bld/
 [Bb]in/
 [Oo]bj/
