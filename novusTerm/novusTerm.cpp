@@ -12,12 +12,15 @@ HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 HWND hConsoleWnd = NULL;
+HANDLE hStdIn = NULL;
+HANDLE hStdOut = NULL;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+DWORD WINAPI        ConsoleThreadProc(LPVOID lpParameter);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -111,8 +114,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     freopen_s(&fp, "CONOUT$", "w", stdout);
     freopen_s(&fp, "CONOUT$", "w", stderr);
 
-    // Execute the dir command
-    system("dir");
     // Get the console window handle
     hConsoleWnd = GetConsoleWindow();
 
@@ -138,6 +139,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     cfi.FontWeight = FW_NORMAL;
     wcscpy_s(cfi.FaceName, L"Consolas");
     SetCurrentConsoleFontEx(hConsole, FALSE, &cfi);
+
+    // Create a thread to handle console input/output
+    HANDLE hThread = CreateThread(NULL, 0, ConsoleThreadProc, NULL, 0, NULL);
 
     // Show the main window
     ShowWindow(hWnd, nCmdShow);
@@ -195,4 +199,73 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
+}
+
+//
+//  FUNCTION: ConsoleThreadProc(LPVOID)
+//
+//  PURPOSE: Thread function to handle console input/output
+//
+//
+//  FUNCTION: ConsoleThreadProc(LPVOID)
+//
+//  PURPOSE: Thread function to handle console input/output
+//
+DWORD WINAPI ConsoleThreadProc(LPVOID lpParameter)
+{
+    CHAR chBuf[1024];
+    BOOL bSuccess = FALSE;
+
+    // Continuously read input from the console and execute commands
+    while (true)
+    {
+
+        // Get the Current Directory 
+        WCHAR currentDirectory[MAX_PATH];
+        GetCurrentDirectory(MAX_PATH, currentDirectory);
+
+        // Conver the current directory to a narrow-character string
+        std::wstring wideCurrentDirectory(currentDirectory);
+        std::string narrowCurrentDirectory(wideCurrentDirectory.begin(), wideCurrentDirectory.end());
+
+        // Print the current director as the command prompt
+        std::cout << "\n" << narrowCurrentDirectory << ">";
+
+        std::string command;
+        std::getline(std::cin, command);
+
+        // Check if the command is "cd"
+        if (command.substr(0, 2) == "cd")
+        {
+            // Extract the directory path from the command
+            std::string directory = command.substr(3);
+
+            // Convert the directory path to a wide-character string
+            std::wstring wideDirectory(directory.begin(), directory.end());
+
+            // Change the current directory
+            if (SetCurrentDirectory(wideDirectory.c_str()))
+            {
+                // Directory changed successfully
+                continue;
+            }
+            else
+            {
+                std::cout << "Failed to change directory." << std::endl;
+            }
+        }
+
+        // Execute the command using _popen
+        FILE* pipe = _popen(command.c_str(), "r");
+        if (pipe != NULL)
+        {
+            while (fgets(chBuf, sizeof(chBuf), pipe) != NULL)
+            {
+                printf("%s", chBuf);
+            }
+            _pclose(pipe);
+        }
+    }
+
+    return 0;
 }

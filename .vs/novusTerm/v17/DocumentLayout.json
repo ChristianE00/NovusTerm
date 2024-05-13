@@ -3,7 +3,7 @@
   "WorkspaceRootPath": "C:\\Users\\Christian\\dev\\NovusTerm\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{86F5B1B8-A09C-46D9-A1E2-79005EC99CF2}|novusTerm\\novusTerm.vcxproj|C:\\Users\\Christian\\dev\\NovusTerm\\novusTerm\\novusTerm.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{86F5B1B8-A09C-46D9-A1E2-79005EC99CF2}|novusTerm\\novusTerm.vcxproj|C:\\Users\\Christian\\dev\\novusTerm\\novusTerm\\novusTerm.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{86F5B1B8-A09C-46D9-A1E2-79005EC99CF2}|novusTerm\\novusTerm.vcxproj|solutionrelative:novusTerm\\novusTerm.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
@@ -24,7 +24,7 @@
               "RelativeDocumentMoniker": "novusTerm\\novusTerm.cpp",
               "ToolTip": "C:\\Users\\Christian\\dev\\NovusTerm\\novusTerm\\novusTerm.cpp",
               "RelativeToolTip": "novusTerm\\novusTerm.cpp",
-              "ViewState": "AQIAAFsAAAAAAAAAAAAIwHAAAAAAAAAA",
+              "ViewState": "AQIAAOkAAAAAAAAAAAAAAAUBAAA9AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-05-13T01:35:36.795Z",
               "EditorCaption": ""
