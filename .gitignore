@@ -176,3 +176,24 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
++ # macOS system files
++ .DS_Store
++
++ # Windows system files
++ Thumbs.db
++
++ # Log files
++ *.log
++
++ # Backup files
++ *.bak
++
++ # Vim swap files
++ *.swp
++
++ # Lock files
++ *.lock
++
++ # Temporary files
++ *.tmp
