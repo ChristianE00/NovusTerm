@@ -211,6 +211,13 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 //
 //  PURPOSE: Thread function to handle console input/output
 //
+// ... (previous code remains the same)
+
+//
+//  FUNCTION: ConsoleThreadProc(LPVOID)
+//
+//  PURPOSE: Thread function to handle console input/output
+//
 DWORD WINAPI ConsoleThreadProc(LPVOID lpParameter)
 {
     CHAR chBuf[1024];
@@ -219,20 +226,20 @@ DWORD WINAPI ConsoleThreadProc(LPVOID lpParameter)
     // Continuously read input from the console and execute commands
     while (true)
     {
-
         // Get the Current Directory 
         WCHAR currentDirectory[MAX_PATH];
         GetCurrentDirectory(MAX_PATH, currentDirectory);
 
-        // Conver the current directory to a narrow-character string
+        // Convert the current directory to a narrow-character string
         std::wstring wideCurrentDirectory(currentDirectory);
         std::string narrowCurrentDirectory(wideCurrentDirectory.begin(), wideCurrentDirectory.end());
 
-        // Print the current director as the command prompt
+        // Print the current directory as the command prompt
         std::cout << "\n" << narrowCurrentDirectory << ">";
 
         std::string command;
         std::getline(std::cin, command);
+
 
         // Check if the command is "cd"
         if (command.substr(0, 2) == "cd")
@@ -254,16 +261,67 @@ DWORD WINAPI ConsoleThreadProc(LPVOID lpParameter)
                 std::cout << "Failed to change directory." << std::endl;
             }
         }
-
-        // Execute the command using _popen
-        FILE* pipe = _popen(command.c_str(), "r");
-        if (pipe != NULL)
+        // check if the command is clear
+        else if (command == "clear" || command == "cls" || command == "c") {
+			// Clear the console window
+			system("cls");
+        }
+       
+        // Check if the command is "vim"
+        //path "C:\Program Files\Vim\vim91\vim.exe"
+        else if (command == "vim")
         {
-            while (fgets(chBuf, sizeof(chBuf), pipe) != NULL)
+            STARTUPINFO si;
+            PROCESS_INFORMATION pi;
+
+            ZeroMemory(&si, sizeof(si));
+            si.cb = sizeof(si);
+            ZeroMemory(&pi, sizeof(pi));
+
+            si.dwFlags = STARTF_USESTDHANDLES;
+            si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+            si.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+            si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+
+            // Specify the full path to the Vim executable
+            WCHAR cmd[] = L"C:\\Program Files\\Vim\\vim91\\vim.exe";
+
+            // Start the child process. 
+            if (!CreateProcess(NULL,   // No module name (use command line)
+                cmd,        // Command line
+                NULL,           // Process handle not inheritable
+                NULL,           // Thread handle not inheritable
+                TRUE,          // Set handle inheritance to TRUE
+                0,              // No creation flags
+                NULL,           // Use parent's environment block
+                NULL,           // Use parent's starting directory 
+                &si,            // Pointer to STARTUPINFO structure
+                &pi)           // Pointer to PROCESS_INFORMATION structure
+                )
             {
-                printf("%s", chBuf);
+                printf("CreateProcess failed (%d).\n", GetLastError());
+                return 1;
             }
-            _pclose(pipe);
+
+            // Wait until child process exits.
+            WaitForSingleObject(pi.hProcess, INFINITE);
+
+            // Close process and thread handles. 
+            CloseHandle(pi.hProcess);
+            CloseHandle(pi.hThread);
+        }
+        else
+        {
+            // Execute the command using _popen
+            FILE* pipe = _popen(command.c_str(), "r");
+            if (pipe != NULL)
+            {
+                while (fgets(chBuf, sizeof(chBuf), pipe) != NULL)
+                {
+                    printf("%s", chBuf);
+                }
+                _pclose(pipe);
+            }
         }
     }
 
