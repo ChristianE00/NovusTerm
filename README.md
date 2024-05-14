@@ -1,7 +1,10 @@
 
 # Terminal Emulator for Windows (Early Development)
+A C++ terminal emulator for **Windows**, supporting cmd and PowerShell commands. 
 
-A C++ terminal emulator for **Windows**, supporting cmd and PowerShell commands.
+![novusTerm](https://github.com/ChristianE00/NovusTerm/assets/112213868/bb7ab146-1a8f-47b3-b626-df2ab209d783)
+
+
 
 ***Current Status***
 
