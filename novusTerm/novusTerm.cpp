@@ -211,7 +211,6 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 //
 //  PURPOSE: Thread function to handle console input/output
 //
-// ... (previous code remains the same)
 
 //
 //  FUNCTION: ConsoleThreadProc(LPVOID)
