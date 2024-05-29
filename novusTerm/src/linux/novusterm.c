@@ -5,24 +5,8 @@ static void on_child_exit(VteTerminal *terminal, gpointer user_data) {
     gtk_main_quit();
 }
 
-int main(int argc, char *argv[]) {
-    gtk_init(&argc, &argv);
-
-    // Create the main window
-    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "NovusTerm");
-    gtk_window_set_default_size(GTK_WINDOW(window), 800, 600);
-    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
-    gtk_container_set_border_width(GTK_CONTAINER(window), 10);
-    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-
-    // Create a header bar
-    GtkWidget *header_bar = gtk_header_bar_new();
-    gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(header_bar), TRUE);
-    gtk_header_bar_set_title(GTK_HEADER_BAR(header_bar), "NovusTerm");
-    gtk_window_set_titlebar(GTK_WINDOW(window), header_bar);
-
-    // Create a VTE terminal widget
+static void on_new_tab(GtkButton *button, gpointer notebook) {
+    // Create a new VTE terminal widget
     VteTerminal *terminal = VTE_TERMINAL(vte_terminal_new());
 
     // Set font
@@ -76,8 +60,41 @@ int main(int argc, char *argv[]) {
     // Handle terminal child exit
     g_signal_connect(terminal, "child-exited", G_CALLBACK(on_child_exit), NULL);
 
-    // Add the terminal widget to the window
-    gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(terminal));
+    // Add the terminal to a new notebook tab
+    GtkWidget *label = gtk_label_new("Terminal");
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), GTK_WIDGET(terminal), label);
+    gtk_widget_show_all(GTK_WIDGET(notebook));
+}
+
+int main(int argc, char *argv[]) {
+    gtk_init(&argc, &argv);
+
+    // Create the main window
+    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window), "NovusTerm");
+    gtk_window_set_default_size(GTK_WINDOW(window), 800, 600);
+    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+    gtk_container_set_border_width(GTK_CONTAINER(window), 10);
+    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+
+    // Create a header bar
+    GtkWidget *header_bar = gtk_header_bar_new();
+    gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(header_bar), TRUE);
+    gtk_header_bar_set_title(GTK_HEADER_BAR(header_bar), "NovusTerm");
+    gtk_window_set_titlebar(GTK_WINDOW(window), header_bar);
+
+    // Create a notebook for tabs
+    GtkWidget *notebook = gtk_notebook_new();
+    gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_TOP);
+    gtk_container_add(GTK_CONTAINER(window), notebook);
+
+    // Create a button to add new tabs
+    GtkWidget *new_tab_button = gtk_button_new_with_label("New Tab");
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(header_bar), new_tab_button);
+    g_signal_connect(new_tab_button, "clicked", G_CALLBACK(on_new_tab), notebook);
+
+    // Add the first tab
+    on_new_tab(NULL, notebook);
 
     // Show all widgets
     gtk_widget_show_all(window);
@@ -87,4 +104,3 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-
